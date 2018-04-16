@@ -1,0 +1,18 @@
+{
+  "name": "controls_practice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "botbuilder": "^4.0.0-m3.0",
+    "botbuilder-azure": "^4.0.0-m3.0",
+    "botbuilder-dialogs": "^4.0.0-m3.0",
+    "request": "^2.85.0",
+    "restify": "^7.1.0"
+  }
+}
