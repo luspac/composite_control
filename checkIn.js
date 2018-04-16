@@ -2,7 +2,7 @@ const botbuilder_dialogs = require("botbuilder-dialogs");
 const botbuilder = require("botbuilder");
 
 class CheckIn extends botbuilder_dialogs.CompositeControl {
-    constructor(convState) {
+    constructor() {
         super(dialogs, 'checkIn');
     }
 }

@@ -1,7 +1,7 @@
 const botbuilder_dialogs = require("botbuilder-dialogs");
 
 class WakeUp extends botbuilder_dialogs.CompositeControl {
-    constructor(convState) {
+    constructor() {
         super(dialogs, 'wakeUp');
     }
 }

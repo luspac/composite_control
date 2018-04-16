@@ -48,7 +48,7 @@ server.post('/api/messages', (req, res) => {
             const dc = dialogs.createContext(context, state);
 
             // Route received request
-            if (conversationState.topic) {
+            if (state.topic) {
                 // We are in the middle of a topic of conversation
                 var result = await dc.continue()
             
@@ -56,7 +56,7 @@ server.post('/api/messages', (req, res) => {
                     // If dialog finished, save the result 
                     state.guestInfo = result.result;
                     // Reset the conversation topic
-                    conversationState.topic = undefined;
+                    state.topic = undefined;
                 }
 
                 // Default response if none was given during the turn.
@@ -65,7 +65,7 @@ server.post('/api/messages', (req, res) => {
                 }
             }
             else if(!state.guestInfo){
-                conversationState.topic = true;
+                state.topic = true;
                 await dc.begin("checkInPrompt", state.guestInfo); // Get user info and greet the user by name
             }
             else {
@@ -73,11 +73,11 @@ server.post('/api/messages', (req, res) => {
                 const utterance = (context.activity.text || '').trim().toLowerCase();
 
                 if(utterance.includes('reserve table')){
-                    conversationState.topic = true;
+                    state.topic = true;
                     await dc.begin('reservePrompt', state.guestInfo)
 
                 } else if(utterance.includes('wake up')){
-                    conversationState.topic = true
+                    state.topic = true
                     await dc.begin('wakeUpPrompt', state.guestInfo);
                 } 
                 else {
@@ -92,10 +92,10 @@ server.post('/api/messages', (req, res) => {
 const dialogs = new botbuilder_dialogs.DialogSet();
 
 const checkIn = require("./checkIn");
-dialogs.add('checkInPrompt', new checkIn.CheckIn(conversationState));
+dialogs.add('checkInPrompt', new checkIn.CheckIn());
 
 const reserve_table = require("./reserveTable");
-dialogs.add('reservePrompt', new reserve_table.ReserveTable(conversationState));
+dialogs.add('reservePrompt', new reserve_table.ReserveTable());
 
 const wake_up = require("./wake_up");
-dialogs.add('wakeUpPrompt', new wake_up.WakeUp(conversationState));
+dialogs.add('wakeUpPrompt', new wake_up.WakeUp());
