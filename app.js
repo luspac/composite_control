@@ -35,16 +35,15 @@ const conversationState = new botbuilder.ConversationState(new botbuilder.Memory
 
 adapter.use(conversationState);
 
-conversationState.topic = undefined; // To track current topic of conversation
+// conversationState.topic = undefined; // To track current topic of conversation
 
 // Listen for incoming requests 
 server.post('/api/messages', (req, res) => {
     adapter.processActivity(req, res, async (context) => {
         if (context.activity.type === 'message') {
 
-            // Update request with current locale
+            // State will store all of your information 
             const state = conversationState.get(context);
-
             const dc = dialogs.createContext(context, state);
 
             // Route received request
@@ -65,19 +64,25 @@ server.post('/api/messages', (req, res) => {
                 }
             }
             else if(!state.guestInfo){
+                // To track current topic of conversation
                 state.topic = true;
-                await dc.begin("checkInPrompt", state.guestInfo); // Get user info and greet the user by name
+                // Get user info and greet the user by name with state passed in as a parameter
+                await dc.begin("checkInPrompt", state.guestInfo); 
             }
             else {
                 // Check for user intent
                 const utterance = (context.activity.text || '').trim().toLowerCase();
 
                 if(utterance.includes('reserve table')){
+                    // To track current topic of conversation
                     state.topic = true;
+                    // Calling the dialog with state passed in as a parameter
                     await dc.begin('reservePrompt', state.guestInfo)
 
                 } else if(utterance.includes('wake up')){
+                    // To track current topic of conversation
                     state.topic = true
+                    // Calling the dialog with state passed in as a parameter
                     await dc.begin('wakeUpPrompt', state.guestInfo);
                 } 
                 else {
@@ -91,6 +96,7 @@ server.post('/api/messages', (req, res) => {
 
 const dialogs = new botbuilder_dialogs.DialogSet();
 
+// Importing the dialogs 
 const checkIn = require("./checkIn");
 dialogs.add('checkInPrompt', new checkIn.CheckIn());
 
