@@ -8,7 +8,9 @@ class ReserveTable extends botbuilder_dialogs.CompositeControl {
 }
 
 // Create a variable that will hold the parent's state object
-var guestInfo = {};
+var guestInfo = {
+    tableNumber: undefined
+};
 
 exports.ReserveTable = ReserveTable;
 

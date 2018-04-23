@@ -8,7 +8,9 @@ class WakeUp extends botbuilder_dialogs.CompositeControl {
 }
 exports.WakeUp = WakeUp;
 // Create a variable that will hold the parent's state object
-var guestInfo = {};
+var guestInfo = {
+    time: undefined
+};
 
 // Defining the conversation flow using a waterfall model
 const dialogs = new botbuilder_dialogs.DialogSet();

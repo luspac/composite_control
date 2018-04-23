@@ -17,11 +17,11 @@ const adapter = new botbuilder.BotFrameworkAdapter({
 });
 
 
-var fs = new botbuilder.FileStorage("C:/temp");
+// var fs = new botbuilder.FileStorage("C:/temp");
 
-var azureStorage = new azure.TableStorage({tableName: "TestAzureTable2",
-storageAccessKey: "HxiikYr01YC68gohuCFJIombWCbxutURASSIXGbmOjI5b0GWh4mNVq1kN5PgFFadcPWStzhZJDyPArCtqlxAxw==", 
-storageAccountOrConnectionString: "luspacstorage"}); 
+// var azureStorage = new azure.TableStorage({tableName: "TestAzureTable2",
+// storageAccessKey: "HxiikYr01YC68gohuCFJIombWCbxutURASSIXGbmOjI5b0GWh4mNVq1kN5PgFFadcPWStzhZJDyPArCtqlxAxw==", 
+// storageAccountOrConnectionString: "luspacstorage"}); 
 
 
 //File Storage
@@ -55,7 +55,7 @@ server.post('/api/messages', (req, res) => {
                     // If dialog finished, save the result 
                     state.guestInfo = result.result;
                     // Reset the conversation topic
-                    state.topic = undefined;
+                    state.topic = false;
                 }
 
                 // Default response if none was given during the turn.

@@ -9,7 +9,10 @@ class CheckIn extends botbuilder_dialogs.CompositeControl {
 exports.CheckIn = CheckIn;
 
 // Create a variable that will hold the parent's state object
-var guestInfo = {};
+var guestInfo = {
+    userName: undefined,
+    room: undefined
+};
 
 // Defining the conversation flow using a waterfall model
 const dialogs = new botbuilder_dialogs.DialogSet();
