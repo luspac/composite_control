@@ -85,6 +85,9 @@ server.post('/api/messages', (req, res) => {
                     // Calling the dialog with state passed in as a parameter
                     await dc.begin('wakeUpPrompt', state.guestInfo);
                 } 
+                else if(utterance.match(/menu/ig)){
+                    await dc.begin('showMenu');
+                }
                 else {
                     // No valid intents, provide some guidence/hints as to what commands the bot understands.
                     await context.sendActivity(`Hi ${state.guestInfo.userName}. How may we serve you today? Request a "wake up" call or "reserve table"?`);
@@ -105,3 +108,6 @@ dialogs.add('reservePrompt', new reserve_table.ReserveTable());
 
 const wake_up = require("./wake_up");
 dialogs.add('wakeUpPrompt', new wake_up.WakeUp());
+
+const customControl = require("./custom_control");
+dialogs.add('showMenu', new customControl.menuControl({menuName: "burgerMenu"}));
