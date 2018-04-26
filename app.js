@@ -1,4 +1,4 @@
-const {BotFrameworkAdapter, FileStorage, ConversationState, UserState, BotStateSet} = require("botbuilder");
+const {BotFrameworkAdapter, FileStorage, ConversationState, UserState, BotStateSet, MessageFactory} = require("botbuilder");
 const {TableStorage} = require("botbuilder-azure");
 const {DialogSet} = require("botbuilder-dialogs");
 const restify = require("restify");
@@ -11,7 +11,7 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 });
 
 // Create adapter
-const adapter = new botbuilder.BotFrameworkAdapter({
+const adapter = new BotFrameworkAdapter({
     appId: process.env.MICROSOFT_APP_ID,
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
@@ -31,69 +31,68 @@ const adapter = new botbuilder.BotFrameworkAdapter({
 // const conversationState = new ConversationState(azureStorage);
 
 //Memory Storage
-const storage = new botbuilder.FileStorage("c:\temp");
-const convoState = new botbuilder.ConversationState(storage);
-const userState  = new botbuilder.UserState(storage);
+const storage = new FileStorage("c:/temp");
+const convoState = new ConversationState(storage);
+const userState  = new UserState(storage);
 
-adapter.use(new botbuilder.BotStateSet(convoState, userState));
+adapter.use(new BotStateSet(convoState, userState));
 
 // Listen for incoming requests 
 server.post('/api/messages', (req, res) => {
     adapter.processActivity(req, res, async (context) => {
-        await context.sendActivity("hi");
-        // const isMessage = context.activity.type === 'message';
+        const isMessage = context.activity.type === 'message';
 
-        // // State will store all of your information 
-        // const convo = convoState.get(context);
-        // const user = userState.get(context);
-        // const dc = dialogs.createContext(context, convo);
-        // await dc.continue(); // Continue the current dialog if one is currently active
+        // State will store all of your information 
+        const convo = convoState.get(context);
+        const user = userState.get(context);
+        const dc = dialogs.createContext(context, convo);
+        await dc.continue(); // Continue the current dialog if one is currently active
 
-        // // Default action
-        // if (!context.responded && isMessage) {
-        //     await dc.begin('mainMenu');            
-        // }
+        // Default action
+        if (!context.responded && isMessage) {
+            await dc.begin('mainMenu');            
+        }
     });
 });
 
-// const dialogs = new DialogSet();
-// dialogs.add('mainMenu', [
-//     async function (dc, args) {
-//         const menu = ["Check In", "Reserve Table", "Wake Up"];
-//         dc.context.sendActivity(MessageFactory.suggestedActions(menu));    
-//     },
-//     async function (dc, result){
-//         // Decide which module to start
-//         switch(result){
-//             case "Check In":
-//                 await dialogs.begin('checkInPrompt');
-//                 break;
-//             case "Reserve Table":
-//                 await dialogs.begin('reserveTable');
-//                 break;
-//             case "Wake Up":
-//                 await dialogs.begin('wakeUpPrompt');
-//                 break;
-//             default:
-//                 await dc.context.sendActivity("Sorry, i don't understand that command. Please choose an option from the list below.");
-//                 break;            
-//         }
-//     },
-//     async function (dc, result){
-//         await dialogs.replace('mainMenu'); // Show the menu again
-//     }
+const dialogs = new DialogSet();
+dialogs.add('mainMenu', [
+    async function (dc, args) {
+        const menu = ["Check In", "Reserve Table", "Wake Up"];
+        await dc.context.sendActivity(MessageFactory.suggestedActions(menu));    
+    },
+    async function (dc, result){
+        // Decide which module to start
+        switch(result){
+            case "Check In":
+                await dc.begin('checkInPrompt');
+                break;
+            case "Reserve Table":
+                await dc.begin('reservePrompt');
+                break;
+            case "Wake Up":
+                await dc.begin('wakeUpPrompt');
+                break;
+            default:
+                await dc.context.sendActivity("Sorry, i don't understand that command. Please choose an option from the list below.");
+                break;            
+        }
+    },
+    async function (dc, result){
+        await dc.replace('mainMenu'); // Show the menu again
+    }
 
-// ]);
+]);
 
-// // Importing the dialogs 
-// const checkIn = require("./checkIn");
-// dialogs.add('checkInPrompt', new checkIn.CheckIn(userState));
+// Importing the dialogs 
+const checkIn = require("./checkIn");
+dialogs.add('checkInPrompt', new checkIn.CheckIn(userState));
 
-// const reserve_table = require("./reserveTable");
-// dialogs.add('reservePrompt', new reserve_table.ReserveTable(userState));
+const reserve_table = require("./reserveTable");
+dialogs.add('reservePrompt', new reserve_table.ReserveTable(userState));
 
-// const wake_up = require("./wake_up");
-// dialogs.add('wakeUpPrompt', new wake_up.WakeUp(userState));
+const wake_up = require("./wake_up");
+dialogs.add('wakeUpPrompt', new wake_up.WakeUp(userState));
 
 // const customControl = require("./custom_control");
 // dialogs.add('showMenu', new customControl.menuControl({menuName: "burgerMenu"}));

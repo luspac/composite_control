@@ -1,27 +1,29 @@
-const { CompositeControl, DialogSet, DatetimePrompt } = require('botbuilder-dialogs');
+const { DialogContainer, DialogSet, DatetimePrompt } = require('botbuilder-dialogs');
 
-class WakeUp extends CompositeControl {
+class WakeUp extends DialogContainer {
     constructor(userState) {
         // Dialog ID of 'wakeup' will start when class is called in the parent
-        super(new DialogSet(), 'wakeUp');
+        super('wakeUp');
 
         this.dialogs.add('wakeUp', [
             async function (dc, args) {
-                // Create a new local wakeUp state object
-                dc.instance.state.wakeUp = {};
-                await dc.prompt('datePrompt', `Hello, ${args.userName}. What time would you like your alarm to be set?`);
+                // Get the user state from context
+                // Create a new local reserveTable state object
+                const user = userState.get(dc.context); 
+                dc.currentDialog.state.wakeUp = {};               
+                await dc.prompt('datePrompt', `Hello, ${user.guestInfo.userName}. What time would you like your alarm to be set?`);
             },
             async function (dc, time){
                 // Save the time
-                dc.instance.state.wakeUp.time = time[0].value
-                await dc.context.sendActivity(`Your alarm is set to ${time[0].value} for room ${guestInfo.room}`);
+                const user = userState.get(dc.context);
+                dc.currentDialog.state.wakeUp.time = time[0].value
+                await dc.context.sendActivity(`Your alarm is set to ${time[0].value} for room ${user.guestInfo.room}`);
                 
                 // Save dialog's state object to the parent's state object
-                const user = userState.get(dc.context);
-                user.wakeUp = dc.instance.state.wakeUp;
+                user.wakeUp = dc.currentDialog.state.wakeUp;
 
                 // End the dialog
-                return dc.end();
+                await dc.end();
             }]);
 
         // Defining the prompt used in this conversation flow
