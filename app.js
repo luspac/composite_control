@@ -32,7 +32,10 @@ const adapter = new BotFrameworkAdapter({
 
 //Memory Storage
 const storage = new FileStorage("c:/temp");
+// ConversationState lasts for the entirity of a conversation then gets disposed of
 const convoState = new ConversationState(storage);
+// UserState persists information about the user
+// across all of the conversations you have with that user
 const userState  = new UserState(storage);
 
 adapter.use(new BotStateSet(convoState, userState));
@@ -40,17 +43,27 @@ adapter.use(new BotStateSet(convoState, userState));
 // Listen for incoming requests 
 server.post('/api/messages', (req, res) => {
     adapter.processActivity(req, res, async (context) => {
+        
         const isMessage = context.activity.type === 'message';
 
         // State will store all of your information 
         const convo = convoState.get(context);
-        const user = userState.get(context);
+        // const user = userState.get(context); // userState will not be used in this example
+
         const dc = dialogs.createContext(context, convo);
         await dc.continue(); // Continue the current dialog if one is currently active
 
         // Default action
         if (!context.responded && isMessage) {
-            await dc.begin('mainMenu');            
+
+            // Getting the user info from the state
+            const userinfo = userState.get(dc.context); 
+            // If guest info is undefined prompt the user to check in
+            if(!userinfo.guestInfo){
+                await dc.begin('checkInPrompt');
+            }else{
+                await dc.begin('mainMenu'); 
+            }           
         }
     });
 });
@@ -58,15 +71,12 @@ server.post('/api/messages', (req, res) => {
 const dialogs = new DialogSet();
 dialogs.add('mainMenu', [
     async function (dc, args) {
-        const menu = ["Check In", "Reserve Table", "Wake Up"];
+        const menu = ["Reserve Table", "Wake Up"];
         await dc.context.sendActivity(MessageFactory.suggestedActions(menu));    
     },
     async function (dc, result){
         // Decide which module to start
         switch(result){
-            case "Check In":
-                await dc.begin('checkInPrompt');
-                break;
             case "Reserve Table":
                 await dc.begin('reservePrompt');
                 break;

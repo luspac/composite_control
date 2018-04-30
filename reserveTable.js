@@ -9,10 +9,11 @@ class ReserveTable extends DialogContainer {
         this.dialogs.add('reserve_table', [
             async function (dc, args) {
                 // Get the user state from context
-                // Create a new local reserveTable state object
                 const user = userState.get(dc.context);
-                
+
+                // Create a new local reserveTable state object
                 dc.currentDialog.state.reserveTable = {};
+
                 const prompt = `Welcome ${user.guestInfo.userName}, which table would you like to reserve?`;
                 const choices = ['1', '2', '3', '4', '5', '6'];
                 await dc.prompt('choicePrompt', prompt, choices);
@@ -23,8 +24,8 @@ class ReserveTable extends DialogContainer {
                 await dc.context.sendActivity(`Sounds great, we will reserve table number ${choice.value} for you.`);
                 
                 // Get the user state from context
-                // Persist dialog's state object to the parent's state object
                 const user = userState.get(dc.context);
+                // Persist dialog's state object to the parent's state object
                 user.reserveTable = dc.currentDialog.state.reserveTable;
 
                 // End the dialog

@@ -8,15 +8,20 @@ class WakeUp extends DialogContainer {
         this.dialogs.add('wakeUp', [
             async function (dc, args) {
                 // Get the user state from context
-                // Create a new local reserveTable state object
                 const user = userState.get(dc.context); 
-                dc.currentDialog.state.wakeUp = {};               
+
+                // Create a new local reserveTable state object
+                dc.currentDialog.state.wakeUp = {};  
+                             
                 await dc.prompt('datePrompt', `Hello, ${user.guestInfo.userName}. What time would you like your alarm to be set?`);
             },
             async function (dc, time){
-                // Save the time
+                // Get the user state from context
                 const user = userState.get(dc.context);
+
+                // Save the time
                 dc.currentDialog.state.wakeUp.time = time[0].value
+
                 await dc.context.sendActivity(`Your alarm is set to ${time[0].value} for room ${user.guestInfo.room}`);
                 
                 // Save dialog's state object to the parent's state object
